@@ -1,0 +1,12 @@
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          config:
+            client: trace
+management:
+  security:
+    enabled: false
+

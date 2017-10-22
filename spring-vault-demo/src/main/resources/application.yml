@@ -1,0 +1,8 @@
+vault:
+  uri: http://localhost:8200
+  token: myroot
+
+spring:
+  h2:
+    console:
+      enabled: true

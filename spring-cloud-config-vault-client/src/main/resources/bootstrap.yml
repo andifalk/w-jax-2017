@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: cfgclient
+  cloud:
+    config:
+      token: myroot

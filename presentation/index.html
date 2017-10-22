@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+		<title>Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault</title>
+        <meta name="description" content="Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault">
+        <meta name="author" content="Andreas Falk">
+
+        <link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <link rel="stylesheet" href = "http://slidifylibraries2.googlecode.com/git/inst/libraries/widgets/bootstrap/css/bootstrap.css">
+
+
+        <!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+                <!-- Introduction -->
+                <section data-background="images/background_front.png" data-background-size="100%">
+                    <div style="color: white">
+                        <br><br>
+                        <h4 style="color: white">Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault</h4>
+                        <p>Andreas Falk</p>
+                        <p><a style="color: white" href="https://github.com/andifalk/cf-summit-2017">Präsentation und Demos: https://github.com/andifalk/cf-summit-2017</a></p>
+                    </div>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h3>Andreas Falk</h3>
+                    NovaTec Consulting GmbH (Stuttgart/Germany)<br>
+                    <img class="plain" src="images/profile.png" width="70%">
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h4 style="color: darkgreen">Authentication (OAuth2/OIDC): OK!</h4>
+                    <h4 style="color: darkgreen">Authorization: OK!</h4>
+                    <img src="images/castle.jpg" class="plain" width="60%">
+                    <h2 style="color: red">What about sensitive data?</h2>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h3>EU General Data Protection Regulation (GDPR)</h3>
+                    &ldquo;...should adopt internal policies and implement measures which meet in particular the principles of <u>data protection by
+                    design</u> and <u>data protection by default</u>&rdquo;
+                    <p><small><a href="http://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679">http://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679 (78)</a></small></p>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h3>A3: Sensitive Data Exposure</h3>
+                    <img src="images/owasp_top_10_2017_rc2_changes.png" class="plain" width="80%">
+                    <p><small><a href="https://github.com/OWASP/Top10">OWASP Top 10 2017 RC 2 - https://github.com/OWASP/Top10</a></small></p>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h2>Typical Sensitive Data</h2>
+                    <h4 class="fragment fade-up">Passwords</h4>
+                    <h4 class="fragment fade-up">Service credentials (DB, Messaging, ...)</h4>
+                    <h4 class="fragment fade-up">OAuth2 client secrets</h4>
+                    <h4 class="fragment fade-up">Encryption keys</h4>
+                    <h4 class="fragment fade-up">Credit card numbers</h4>
+                    <h4 class="fragment fade-up">Social security numbers</h4>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <img src="images/spring_properties.png" class="plain">
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h2>Application-xxx.Yaml</h2>
+                    <h4>Database access credentials</h4>
+                    <pre><code class="properties" data-trim>
+                        spring:
+                            datasource:
+                                url: jdbc:postgresql://localhost/test
+                                username: root
+                                password: mysupersecretpassword
+                    </code></pre>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h1>Key Management</h1>
+                    <img src="images/babuschka.jpg" class="plain" width="60%">
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h2>Agenda: Security Evolution</h2>
+                    <img src="images/security_evolution.png" class="plain" width="70%">
+                </section>
+
+                <!-- Vault -->
+
+                <section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Introduction</h2>
+                        <img src="images/vault-black.png" class="plain" width="70%">
+                        <a href="https://www.vaultproject.io/">https://www.vaultproject.io</a>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h1>Vault</h1>
+                        <h4>A Tool for Managing Secrets like...</h4>
+                        <ul>
+                            <li>Tokens</li>
+                            <li>Passwords</li>
+                            <li>X.509 Certificates</li>
+                            <li>API keys</li>
+                            <li>DB credentials</li>
+                            <li>And other secrets...</li>
+                        </ul>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h1>Vault</h1>
+                        <img src="images/army.jpg" class="plain" width="40%">
+                        <blockquote cite="https://www.youtube.com/watch?v=iqigxGccezI">
+                            &ldquo;A Security Swiss Army Knife&rdquo;
+                        </blockquote>
+                        <p>Jeff Mitchell, Vault Lead, HashiCorp</p>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Key Features</h2>
+                        <h4>Secure Secret Storage</h4>
+                        <h4>Dynamic Secrets</h4>
+                        <h4>Data Encryption (AES cypher)</h4>
+                        <h4>Leasing, Renewal & Revocation</h4>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Operational Features</h2>
+                        <h4>Authentication</h4>
+                        <h4>Authorization (ACL)</h4>
+                        <h4>Audit Logs</h4>
+                        <h4>High Availability Mode (HA)</h4>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Architecture</h2>
+                        <img src="images/vault_architecture.png" class="plain" width="1500px">
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Vault Storage</h2>
+                        <img src="images/vault_storage.png" class="plain">
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Vault Secrets</h2>
+                        <img src="images/vault_secrets.png" class="plain">
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Vault Authentication</h2>
+                        <img src="images/vault_authentication.png" class="plain" width="80%">
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Vault Key Shares</h2>
+                        <img src="images/key_shares.png" class="plain">
+                        <aside class="notes">
+                            Vault uses a technique known as Shamir's secret sharing algorithm to split
+                            the master key into 5 shares, any 3 of which are required to reconstruct the master key.
+                        </aside>
+                    </section>
+                </section>
+
+                <!-- Spring Vault -->
+                <section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Spring Vault</h2>
+                        <img src="images/spring_vault.png" class="plain">
+                        <p>
+                            <small><a href="https://projects.spring.io/spring-vault">
+                                https://projects.spring.io/spring-vault</a></small>
+                        </p>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <img src="images/spring_vault_overview.png" class="plain">
+                    </section>
+
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Encryption as a service</h2>
+                        <img src="images/spring_vault_transit.png" class="plain">
+                    </section>
+                </section>
+
+                <!-- Spring Cloud Vault -->
+                <section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Spring Cloud Vault</h2>
+                        <img src="images/spring_cloud_vault.png" class="plain">
+                        <p>
+                            <small><a href="https://cloud.spring.io/spring-cloud-vault">
+                                https://cloud.spring.io/spring-cloud-vault</a></small>
+                        </p>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <img src="images/springcloud_vault.png" class="plain">
+                    </section>
+
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Secret vault mapping</h2>
+                        <h4>bootstrap.properties</h4>
+                        <pre><code class="properties" data-trim>
+                            spring.cloud.vault.generic.application-name =
+                                    application1,additional/keys
+                            #spring.cloud.vault.application-name = ...
+                            #spring.application.name = ...
+                        </code></pre>
+                        <h4>Mapped secret paths in vault</h4>
+                        <pre><code class="uri" data-trim>
+                            /secret/application1
+                            /secret/application1/myprofile
+                            /secret/additional/keys
+                            /secret/application
+                            /secret/application/myprofile
+                        </code></pre>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Rotate Database Credentials</h2>
+                        <h4>bootstrap.yml</h4>
+                        <pre><code class="yaml" data-trim>
+                            spring.cloud.vault:
+                                postgresql:
+                                    enabled: true
+                                    role: readonly
+                                    backend: postgresql
+                                    username-property: spring.datasource.username
+                                    password-property: spring.datasource.username
+                        </code></pre>
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <img src="images/springcloudconfig_vault.png" class="plain">
+                    </section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <h2>Spring Cloud Config Vault Environment Repository</h2>
+                        <h4>application.properties (Config Server)</h4>
+                        <pre><code class="properties" data-trim>
+                            spring.profiles.active=git,vault
+                            spring.cloud.config.server.vault.host=127.0.0.1
+                            spring.cloud.config.server.vault.port=8200
+                            spring.cloud.config.server.vault.scheme=https
+                        </code></pre>
+                        <h4>bootstrap.properties (Client)</h4>
+                        <pre><code class="properties" data-trim>
+                            spring.cloud.config.token = YourVaultToken
+                        </code></pre>
+                    </section>
+                </section>
+
+                <!-- Cloud Foundry Vault Service Broker -->
+
+                <section>
+                    <section data-background="images/background_normal.png" data-background-size="75%">
+                        <img src="images/cloudfoundry_vault.png" class="plain" width="70%">
+                        <a href="https://github.com/hashicorp/vault-service-broker">https://github.com/hashicorp/vault-service-broker</a>
+                        <a href="https://github.com/pivotal-cf/spring-cloud-vault-connector">https://github.com/pivotal-cf/spring-cloud-vault-connector</a>
+                    </section>
+                </section>
+
+                <!-- The end -->
+
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h1>Q&A</h1>
+                    <p>http://www.novatec-gmbh.de</br>
+                    http://blog.novatec-gmbh.de</p>
+                    <p>andreas.falk@novatec-gmbh.de</p>
+                    <p>@NT_AQE, @andifalk</p>
+                </section>
+                <section data-background="images/background_normal.png" data-background-size="75%">
+                    <h2>References</h2>
+                    <small>
+                        <ul>
+                            <li><a href="https://cloud.spring.io/spring-cloud-config/">Spring Cloud Config (https://cloud.spring.io/spring-cloud-config/)</a></li>
+                            <li><a href="https://en.wikipedia.org/wiki/Shamir's_Secret_Sharing">Shamir's secret sharing (https://en.wikipedia.org/wiki/Shamir's_Secret_Sharing)</a></li>
+                            <li><a href="https://cloud.spring.io/spring-cloud-vault">Spring Cloud Vault (https://cloud.spring.io/spring-cloud-vault)</a></li>
+                            <li><a href="https://www.vaultproject.io">Vault (https://www.vaultproject.io)</a></li>
+                            <li><a href="https://github.com/hashicorp/vault-service-broker">Cloud Foundry Vault Service Broker (https://github.com/hashicorp/vault-service-broker)</a></li>
+                            <li><a href="https://github.com/andifalk/cf-summit-2017">Sources and Presentation (https://github.com/andifalk/cfsummit2017)</a></li>
+                        </ul>
+                        <p>All images used are from <a href="https://pixabay.com/">Pixabay</a> and are published under <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">Creative Commons CC0 license.</a></p>
+                        All used logos are trademarks of corresponding companies
+                    </small>
+                </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+
+		<script>
+			Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+                pdfMaxPagesPerSlide: 1,
+                allottedTime: 45 * 60 * 1000, // 45 minutes
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+				dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/print-pdf/print-pdf.js' },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/tagcloud/tagcloud.js', async: true },
+                    { src: 'plugin/elapsed-time-bar/elapsed-time-bar.js'},
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() {
+					    hljs.initHighlightingOnLoad(); }
+					}
+				]
+			});
+            Reveal.configure({ slideNumber: 'c/t' });
+		</script>
+	</body>
+</html>

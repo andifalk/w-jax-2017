@@ -1,0 +1,21 @@
+
+spring:
+  profiles:
+    active: vault, git
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/andifalk/cloud-config-repository
+server:
+  port: 8888
+
+management:
+  security:
+    enabled: false
+
+
+
+
+
+
