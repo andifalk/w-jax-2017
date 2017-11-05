@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: reactive-spring-vault
+  cloud:
+    vault:
+      authentication: TOKEN
+      token: myroot
+      scheme: http
