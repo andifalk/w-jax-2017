@@ -1,5 +1,4 @@
 # w-jax-2017
-Presentation and Demos for W-JAX 2017 session "Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault"
 
 [Presentation](https://andifalk.github.io/w-jax-2017/presentation/index.html) and demos for 
 [Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault](https://jax.de/cloud-container-serverless/verteilte-konfiguration-und-verwaltung-sensibler-daten-mit-spring-cloud-config-und-vault/) at [W-JAX 2017](https://jax.de).
