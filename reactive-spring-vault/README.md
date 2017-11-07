@@ -7,16 +7,22 @@ initializes an in-memory user store with secret password stored in vault.
 ## Preparation
 
 1. Startup vault using `vault start -dev`
-2. Note down the root token from screen output and put this as value for property _vault.token_ in `application.yml`
+2. Add root key `vault token-create -id=myroot` as defined in property _vault.token_ in `application.yml`
+3. Add the secrets: `vault write secret/reactive-spring-vault userpass=password adminpass=secret`
 3. Start the application via `./gradlew bootRun`
 
 ## Rest endpoints
 
-* List all person entities with decrypted values:
+* List all books:
 
   [GET /api/books](http://localhost:8080/api/books)
   
 Please use following login data:
 
+Standard user
 * User=user
-* Password=mysecret
+* Password=password
+
+Admin user
+* User=admin
+* Password=secret

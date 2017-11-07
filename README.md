@@ -1,13 +1,12 @@
 # w-jax-2017
-Präsentation und Demos zur W-JAX 2017 Session "Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault"
+Presentation and Demos for W-JAX 2017 session "Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault"
 
-[Präsentation](https://andifalk.github.io/w-jax-2017/presentation/index.html) and demos for 
-[Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault](https://jax.de/cloud-container-serverless/verteilte-konfiguration-und-verwaltung-sensibler-daten-mit-spring-cloud-config-und-vault/) at 
-[W-JAX 2017](https://jax.de).
+[Presentation](https://andifalk.github.io/w-jax-2017/presentation/index.html) and demos for 
+[Verteilte Konfiguration und Verwaltung sensibler Daten mit Spring Cloud Config und Vault](https://jax.de/cloud-container-serverless/verteilte-konfiguration-und-verwaltung-sensibler-daten-mit-spring-cloud-config-und-vault/) at [W-JAX 2017](https://jax.de).
 
-## Präsentation
+## Presentation
 
-Die Präsentation dieser Session kann [hier](https://andifalk.github.io/w-jax-2017/presentation/index.html) abgerufen werden.
+Die Presentation of this session can be started [here](https://andifalk.github.io/w-jax-2017/presentation/index.html).
 
 ## Spring Vault Demo
 
@@ -26,3 +25,8 @@ This demo implements a spring cloud config server both providing access to a...
 
 This demo implements a spring cloud config client connecting to the corresponding
 demo server and reads two configuration properties, one from git repo and one from vault.
+
+## Spring Reactive Vault Demo
+This demo shows how to use spring vault project together with reactive spring web (flux) and reactive spring security.
+During startup the demo application already creates some book test data and initializes an in-memory user store with secret password stored in vault.
+

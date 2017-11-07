@@ -9,7 +9,7 @@ demo server on port `8888` and reads two configuration properties...
 ## Preparation
 
 1. Startup vault using `vault start -dev`
-2. Note down the root token from screen output and put this as value for property _vault.token_ in `bootstrap.yml`
+2. Add root key `vault token-create -id=myroot` as defined in property _vault.token_ in `application.yml`
 3. Start the application via `./gradlew bootRun`
 
 After starting the application you can see the current values of the properties by accessing the following
