@@ -6,7 +6,7 @@ sensible data like social security and credit card numbers.
 
 ## Preparation
 
-1. Startup vault using `vault start -dev`
+1. Startup vault using `vault server -dev`
 2. Add root key `vault token-create -id=myroot` as defined in property _vault.token_ in `application.yml`
 3. Start the application via `./gradlew bootRun`
 

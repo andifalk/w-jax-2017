@@ -6,10 +6,11 @@ initializes an in-memory user store with secret password stored in vault.
 
 ## Preparation
 
-1. Startup vault using `vault start -dev`
+1. Startup vault using `vault server -dev`
 2. Add root key `vault token-create -id=myroot` as defined in property _vault.token_ in `application.yml`
 3. Add the secrets: `vault write secret/reactive-spring-vault userpass=password adminpass=secret`
-3. Start the application via `./gradlew bootRun`
+4. Start mongodb (for reactive data access) on localhost
+5. Start the application via `./gradlew bootRun`
 
 ## Rest endpoints
 
